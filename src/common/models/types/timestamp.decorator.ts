@@ -1,6 +1,14 @@
+/**
+ * @module common
+ */
+/** End Typedoc Module Declaration */
 import { ModelConstructor } from '../model';
 import { initializeMetadata } from '../../metadata/metadata';
 
+/**
+ * Initializes the timestamps metadata property with empty values
+ * @param target
+ */
 function initTimestamps(target: ModelConstructor<any>) {
   initializeMetadata(target);
 
@@ -9,6 +17,11 @@ function initTimestamps(target: ModelConstructor<any>) {
   }
 }
 
+/**
+ *  @CreatedDate property decorator for assigning which property is to be defined as the created date
+ * @returns {function(ModelConstructor<any>, string): void}
+ * @constructor
+ */
 export function CreatedDate(): PropertyDecorator {
 
   return function createdDate(target: ModelConstructor<any>, propertyKey: string): void {
@@ -19,6 +32,11 @@ export function CreatedDate(): PropertyDecorator {
 
 }
 
+/**
+ *  @UpdatedDate property decorator for assigning which property is to be defined as the updated date
+ * @returns {function(ModelConstructor<any>, string): void}
+ * @constructor
+ */
 export function UpdatedDate(): PropertyDecorator {
 
   return function updatedDate(target: ModelConstructor<any>, propertyKey: string): void {

@@ -1,3 +1,7 @@
+/**
+ * @module server
+ */
+/** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
 import { Logger, LogLevel } from '../../common/services/logger.service';
 import { createConnection, CreateConnectionOptions, Connection } from 'typeorm';
@@ -17,10 +21,10 @@ export interface DatabaseLogFunction {
 export class Database extends AbstractService {
 
   /**
-   * The underlying driver that handles the database connection.
-   * In this case an instance of Sequelize
+   * The current connection instance
    */
   protected connection: Connection;
+
   /**
    * Logger instance for the class, initialized with `database` source
    */
@@ -38,6 +42,10 @@ export class Database extends AbstractService {
     this.initialized = this.initialize();
   }
 
+  /**
+   * Connects to the database and stores reference to the connection instance
+   * @returns {Promise<Database>}
+   */
   public initialize(): Promise<this> {
     return Database.connect((level: LogLevel, message: any) => this.logger[level](message))
       .then((c) => {
@@ -50,6 +58,12 @@ export class Database extends AbstractService {
       });
   }
 
+  /**
+   * Connect to the datatbase, returning promised of connection instance.
+   * Static method so calls can be made outside of dependency injection context for example pre-bootstrap
+   * @param logFunction
+   * @returns {Promise<Connection>}
+   */
   public static connect(logFunction?: DatabaseLogFunction): Promise<Connection> {
 
     logFunction('info', 'Connecting to database');
@@ -84,7 +98,8 @@ export class Database extends AbstractService {
   }
 
   /**
-   * Retrieve the driver instance
+   * Retrieve connection isntance
+   * @returns {Promise<Connection>}
    */
   public getConnection(): Promise<Connection> {
     return this.initialized.then(() => this.connection);

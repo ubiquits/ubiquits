@@ -1,3 +1,7 @@
+/**
+ * @module server
+ */
+/** End Typedoc Module Declaration */
 import { Injectable, Injector } from '@angular/core';
 import { AbstractModel, ModelStatic, identifier } from '../../common/models/model';
 import { Database } from '../services/database.service';
@@ -6,8 +10,10 @@ import { AbstractStore } from '../../common/stores/store';
 import { Collection } from '../../common/models/collection';
 import { NotFoundException } from '../exeptions/exceptions';
 import { Repository, Connection } from 'typeorm';
+
 /**
- * This store is for saving and retrieving models from the database using Sequelize
+ * Database store should be extended with a specific implementation for a model. Interacts with
+ * TypeORM's repository to handle CRUD with the database
  */
 @Injectable()
 export abstract class DatabaseStore<T extends AbstractModel> extends AbstractStore<T> {
@@ -82,7 +88,7 @@ export abstract class DatabaseStore<T extends AbstractModel> extends AbstractSto
         throw e;
       });
   }
-  
+
   /**
    * @inheritdoc
    */

@@ -1,3 +1,7 @@
+/**
+ * @module server
+ */
+/** End Typedoc Module Declaration */
 import { Server } from '../servers/abstract.server';
 import { Injectable } from '@angular/core';
 import { AbstractController } from './abstract.controller';
@@ -10,7 +14,8 @@ import { AbstractStore } from '../../common/stores/store';
 import { Collection } from '../../common/models/collection';
 
 /**
- * Abstract controller that all controllers should extend from
+ * Provides resource controller that all controllers that interact RESTfully with ModelStores
+ * should extend from.
  */
 @Injectable()
 export abstract class ResourceController<M extends AbstractModel> extends AbstractController {
