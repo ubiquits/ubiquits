@@ -3,7 +3,7 @@
  */
 /** End Typedoc Module Declaration */
 import { registry, EntityType, EntityMetadata } from './entityRegistry';
-import { ModelMetadata } from '../metadata/metadata';
+import { ModelMetadata, ControllerMetadata } from '../metadata/metadata';
 
 /**
  * Common decorator factory function to simplify decorator declarations
@@ -13,7 +13,7 @@ import { ModelMetadata } from '../metadata/metadata';
  */
 function entityRegistryFunction(type: EntityType, metadata?: EntityMetadata): ClassDecorator {
   return function <TFunction extends Function>(target: TFunction): void {
-    registry.register(type, target.prototype.constructor, metadata);
+    registry.register(type, target, metadata);
   }
 }
 
@@ -46,11 +46,12 @@ export function Model(metadata?: ModelMetadata): ClassDecorator {
  *  @Controller()
  *  export class ExampleController extends AbstractController {}
  * ```
+ * @param metadata
  * @returns {ClassDecorator}
  * @constructor
  */
-export function Controller(): ClassDecorator {
-  return entityRegistryFunction('controller');
+export function Controller(metadata?: ControllerMetadata): ClassDecorator {
+  return entityRegistryFunction('controller', metadata);
 }
 
 /**

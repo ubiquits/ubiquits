@@ -4,8 +4,12 @@
 /** End Typedoc Module Declaration */
 import { TableOptions } from 'typeorm/decorator/options/TableOptions';
 import { RelationType, Relation } from '../models/relations/index';
-import { RegistryEntityConstructor } from '../registry/entityRegistry';
+import {
+  RegistryEntityConstructor, EntityMetadata,
+  RegistryEntityStatic
+} from '../registry/entityRegistry';
 import { ColumnOptions } from 'typeorm/decorator/options/ColumnOptions';
+import { MiddlewareRegistry } from '../../server/controllers/abstract.controller';
 
 export interface PropertyDefinition {
   type: any;
@@ -24,12 +28,20 @@ export interface ModelMetadata {
   }
 }
 
+export interface ControllerMetadata {
+  routeBase?:string;
+  middleware?: {
+    methods: Map<string, MiddlewareRegistry>
+    all: MiddlewareRegistry
+  }
+}
+
 /**
  * Common function used by many methods to ensure the entity has __metadata initialized on it's constructor
  * @param target
  */
-export function initializeMetadata(target: RegistryEntityConstructor) {
-  if (!target.constructor.__metadata) {
-    target.constructor.__metadata = {};
+export function initializeMetadata(target: RegistryEntityStatic<EntityMetadata>) {
+  if (!target.__metadata) {
+    target.__metadata = {};
   }
 }

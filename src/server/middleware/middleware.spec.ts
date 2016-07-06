@@ -28,8 +28,8 @@ function middlewareFixture(input: string): IsolatedMiddlewareFactory {
 @Injectable()
 class MiddlewareController extends AbstractController {
 
-  constructor(server: Server, logger: Logger) {
-    super(server, logger);
+  constructor(logger: Logger) {
+    super(logger);
   }
 
   @Route('GET', '/test')
@@ -58,18 +58,18 @@ describe('Middleware Decorators', () => {
   });
 
   it('defines registeredMiddleware on the controller',
-    inject([MiddlewareController, ReflectiveInjector],
-      (c: MiddlewareController, i: ReflectiveInjector) => {
+    inject([MiddlewareController, ReflectiveInjector, Server],
+      (c: MiddlewareController, i: ReflectiveInjector, s: Server) => {
 
-        controller = c.registerRoutes()
+        controller = c.registerRoutes(s)
           .registerInjector(i);
 
-        expect(controller.registeredMiddleware)
+        expect(controller.getMetadata().middleware)
           .not
           .toBeNull();
-        expect(controller.registeredMiddleware.all.before.length)
+        expect(controller.getMetadata().middleware.all.before.length)
           .toEqual(2);
-        expect(controller.registeredMiddleware.all.after.length)
+        expect(controller.getMetadata().middleware.all.after.length)
           .toEqual(1);
       }));
 
@@ -77,7 +77,7 @@ describe('Middleware Decorators', () => {
     inject([MiddlewareController, ReflectiveInjector, Server],
       (c: MiddlewareController, i: ReflectiveInjector, s: Server) => {
 
-        controller = c.registerRoutes()
+        controller = c.registerRoutes(s)
           .registerInjector(i);
 
         const callStack: any = s.getRoutes()
@@ -102,7 +102,7 @@ describe('Middleware Decorators', () => {
     async(inject([MiddlewareController, ReflectiveInjector, Server],
       (c: MiddlewareController, i: ReflectiveInjector, s: Server) => {
 
-        controller = c.registerRoutes()
+        controller = c.registerRoutes(s)
           .registerInjector(i);
 
         const callStackHandler: any = s.getRoutes()

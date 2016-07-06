@@ -11,6 +11,8 @@ import { Response } from './response';
 import { Request } from './request';
 import { initializeMiddlewareRegister } from '../middleware/middleware.decorator';
 import { HttpException, InternalServerErrorException } from '../exeptions/exceptions';
+import { RegistryEntityStatic, RegistryEntity } from '../../common/registry/entityRegistry';
+import { ControllerMetadata } from '../../common/metadata/metadata';
 
 export interface MethodDefinition {
   method: HttpMethod;
@@ -28,27 +30,36 @@ export interface MethodDictionary {
 
 export type MiddlewareLocation = 'before' | 'after';
 
+export interface ControllerConstructor<T extends AbstractController> extends Function {
+  constructor: ControllerStatic<T>;
+}
+
+export interface ControllerStatic<T extends AbstractController> extends RegistryEntityStatic<ControllerMetadata> {
+  new(server: Server, logger: Logger): T;
+  prototype: T;
+  registerMiddleware(location: MiddlewareLocation, middlewareFactories: InjectableMiddlewareFactory[], methodSignature?: string): void;
+}
+
 /**
- * Abstract controller that all controllers *must* extend from. The [[ControllerBootstrapper]] relies
- * on the interface provided by this class to invoke registration of routes and middleware
+ * Abstract controller that all controllers *must* extend from. The [[ControllerBootstrapper]]
+ * relies on the interface provided by this class to invoke registration of routes and middleware
  */
 @Injectable()
-export abstract class AbstractController {
+export abstract class AbstractController extends RegistryEntity<ControllerMetadata> {
 
-  protected actionMethods: Map<string, MethodDefinition>;
-  public registeredMiddleware: {
-    methods: Map<string, MiddlewareRegistry>
-    all: MiddlewareRegistry
+  public static __metadataDefault: ControllerMetadata = {
+    routeBase: '/'
   };
 
-  /** The start of the route of this controller instance */
-  protected routeBase: string;
+  protected actionMethods: Map<string, MethodDefinition>;
+
   /** Current controller instance */
   protected logger: Logger;
   /** Instance of injector used for the registration of @Injectable middleware */
   private injector: Injector;
 
-  constructor(protected server: Server, logger: Logger) {
+  constructor(logger: Logger) {
+    super();
     this.logger = logger.source(this.constructor.name);
   }
 
@@ -90,33 +101,37 @@ export abstract class AbstractController {
    * @param location
    * @param middlewareFactories
    * @param methodSignature
-   * @returns {AbstractController}
+   * @returns void
    */
-  public registerMiddleware(location: MiddlewareLocation, middlewareFactories: InjectableMiddlewareFactory[], methodSignature: string): this {
+  public static registerMiddleware(location: MiddlewareLocation, middlewareFactories: InjectableMiddlewareFactory[], methodSignature?: string): void {
 
     initializeMiddlewareRegister(this);
 
-    let current: MiddlewareRegistry = this.registeredMiddleware.methods.get(methodSignature);
+    const middleware = (this.getMetadata() as ControllerMetadata).middleware;
+    if (methodSignature) {
+      let current: MiddlewareRegistry = middleware.methods.get(methodSignature);
 
-    if (!current) {
-      current = {
-        before: [],
-        after: []
-      };
+      if (!current) {
+        current = {
+          before: [],
+          after: []
+        };
 
-      this.registeredMiddleware.methods.set(methodSignature, current);
+        middleware.methods.set(methodSignature, current);
+      }
+
+      current[location].push(...middlewareFactories);
+    } else {
+      middleware.all[location].push(...middlewareFactories);
     }
 
-    current[location].push(...middlewareFactories);
-
-    return this;
   }
 
   /**
-   * Register all routes defined in this controller (or any extending instances)
+   * Register all routes defined in this controller (or any extending instances) with the server
    * @returns {AbstractController}
    */
-  public registerRoutes(): this {
+  public registerRoutes(server: Server): this {
 
     this.actionMethods.forEach((methodDefinition: MethodDefinition, methodSignature: string) => {
 
@@ -124,13 +139,20 @@ export abstract class AbstractController {
 
       callStack.push(this[methodSignature]);
 
-      if (this.registeredMiddleware) {
-        const methodMiddlewareFactories = this.registeredMiddleware.methods.get(methodSignature);
+      if (this.getMetadata().middleware) {
+        const methodMiddlewareFactories = this.getMetadata()
+          .middleware
+          .methods
+          .get(methodSignature);
 
         //wrap method registered factories with the class defined ones [beforeAll, before, after,
         // afterAll]
-        const beforeMiddleware = this.registeredMiddleware.all.before.concat(methodMiddlewareFactories.before);
-        const afterMiddleware  = methodMiddlewareFactories.after.concat(this.registeredMiddleware.all.after);
+        const beforeMiddleware = this.getMetadata()
+          .middleware
+          .all
+          .before
+          .concat(methodMiddlewareFactories.before);
+        const afterMiddleware  = methodMiddlewareFactories.after.concat(this.getMetadata().middleware.all.after);
 
         if (methodMiddlewareFactories) {
           callStack.unshift(...beforeMiddleware.map((middleware: MiddlewareFactory) => middleware(this.injector)));
@@ -138,10 +160,10 @@ export abstract class AbstractController {
         }
       }
 
-      this.server.register({
+      server.register({
         methodName: methodSignature,
         method: methodDefinition.method,
-        path: `${process.env.API_BASE}/${this.routeBase}${methodDefinition.route}`,
+        path: `${process.env.API_BASE}/${this.getMetadata().routeBase}${methodDefinition.route}`,
         callStack: callStack,
         callStackHandler: (request: Request, response: Response): Promise<Response> => {
           return callStack.reduce((current: Promise<Response>, next: PromiseFactory<Response>): Promise<Response> => {
@@ -166,7 +188,7 @@ export abstract class AbstractController {
         }
       });
 
-      this.logger.debug(`registered ${methodDefinition.method} ${this.routeBase}${methodDefinition.route} to ${this.constructor.name}@${methodSignature}`);
+      this.logger.debug(`registered ${methodDefinition.method} ${this.getMetadata().routeBase}${methodDefinition.route} to ${this.constructor.name}@${methodSignature}`);
     });
 
     return this;
