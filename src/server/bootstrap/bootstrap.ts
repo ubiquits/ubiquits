@@ -16,6 +16,7 @@ import { EntityBootstrapper } from './entity.bootstrapper';
 import { MigrationBootstrapper } from './migrations.bootstrapper';
 import { ServiceBootstrapper } from './services.bootstrapper';
 import { LoggerMock } from '../../common/services/logger.service.mock';
+import { CommandBootstrapper } from './commands.bootstrapper';
 
 export type ProviderType = Type | {
   [k: string]: any;
@@ -112,6 +113,7 @@ export function bootstrap(loadClasses: ClassDictionary<any>[] = [], providers: P
           new MigrationBootstrapper,
           new SeederBootstrapper,
           new ControllerBootstrapper,
+          new CommandBootstrapper,
         ];
 
         const bootrapperProviders:any[] = resolvedBootstrappers.reduce((result: any[], bootstrapper: EntityBootstrapper) => {

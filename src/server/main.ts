@@ -15,6 +15,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as _ from 'lodash';
 import { ProviderDefinition } from './bootstrap/bootstrap';
+import { CORE_COMMANDS } from './services/remoteCli/commands/index';
 
 // Load .env variables into process.env.*
 dotenv.config({
@@ -35,4 +36,5 @@ export const CORE_PROVIDERS: ProviderDefinition[] = [
   // {provide: Server, useClass: HapiServer},
   {provide: Server, useClass: ExpressServer},
   {provide: Logger, useClass: ConsoleLogger},
+  ...CORE_COMMANDS
 ];

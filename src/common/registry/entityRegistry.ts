@@ -5,7 +5,7 @@
 import * as _ from 'lodash';
 import { ModelMetadata, initializeMetadata, ControllerMetadata } from '../metadata/metadata';
 
-export type EntityType = 'model' | 'controller' | 'seeder' | 'migration' | 'store' | 'service';
+export type EntityType = 'model' | 'controller' | 'seeder' | 'migration' | 'store' | 'service' | 'command';
 export type EntityMetadata = ModelMetadata | ControllerMetadata;
 
 export interface RegistryEntityConstructor<M>{

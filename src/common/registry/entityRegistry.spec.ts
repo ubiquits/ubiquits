@@ -1,5 +1,5 @@
 import { EntityRegistry, EntityType, registry } from './entityRegistry';
-import { Model, Controller, Seeder, Migration, Store, Service } from './decorators';
+import { Model, Controller, Seeder, Migration, Store, Service, Command } from './decorators';
 import { AbstractModel } from '../models/model';
 
 describe('Entity registry', () => {
@@ -181,6 +181,9 @@ describe('Entity registry', () => {
     @Service()
     class FooService {
     }
+    @Command()
+    class FooCommand {
+    }
 
     [
       'Model',
@@ -189,6 +192,7 @@ describe('Entity registry', () => {
       'Migration',
       'Store',
       'Service',
+      'Command',
     ].forEach((decorator) => {
 
       let type = (decorator.toLowerCase() as EntityType);

@@ -5,10 +5,7 @@
 import { Injectable, Injector } from '@angular/core';
 import * as chalk from 'chalk';
 import * as Vantage from '@xiphiaz/vantage';
-
 import { jwtAuthStrategyFactory } from './jwtAuthStrategy';
-
-import Socket = SocketIO.Socket;
 import { AbstractService } from '../../../common/services/service';
 import { Service } from '../../../common/registry/decorators';
 import { Logger } from '../../../common/services/logger.service';
@@ -16,6 +13,9 @@ import { AuthService } from '../authentication/auth.service';
 import { Server, RouteConfig } from '../../servers/abstract.server';
 import { Response } from '../../controllers/response';
 import { PromiseFactory } from '../../../common/util/serialPromise';
+import { CliCommand } from './commands/index';
+
+import Socket = SocketIO.Socket;
 const table: Table = require('table').default;
 
 export interface TableBorderTemplate {
@@ -95,6 +95,10 @@ export interface AuthenticationCallback {
   (errorMessage: string, isSuccessful: boolean): void;
 }
 
+
+
+
+
 /**
  * Class allows developers to register custom commands that can be remote executed in a
  * shell environment. Useful for things like migrations and debugging.
@@ -142,7 +146,7 @@ export class RemoteCli extends AbstractService {
 
     this.vantage.command('routes')
       .description('outputs route table')
-      .action(function (args: any, callback: Function) {
+      .action(function (args: any, callback: Function):void {
 
         remoteCli.logger.info('CLI session retrieving routes');
 
@@ -165,7 +169,18 @@ export class RemoteCli extends AbstractService {
         callback();
       });
 
+    // const commandInjector = ReflectiveInjector.resolveAndCreate([LogTailCommand], this.injector);
+    //
+    // commandInjector.get(LogTailCommand).register(this.vantage);
+
+
     return this;
+  }
+
+  public registerCommand(command:CliCommand):void {
+
+    command.register(this.vantage);
+
   }
 
   /**
@@ -214,3 +229,4 @@ export class RemoteCli extends AbstractService {
     this.logger.debug('Registered vantage authentication strategy');
   }
 }
+

@@ -123,3 +123,20 @@ export function Store(): ClassDecorator {
 export function Service(): ClassDecorator {
   return entityRegistryFunction('service');
 }
+
+/**
+ *  @Command class decorator for registering class with the [[EntityRegistry]]
+ *
+ * Example:
+ * ```typescript
+ *  import { Command, AbstractService } from '@ubiquits/core/common';
+ *
+ *  @Command()
+ *  export class ExampleService implements Command {}
+ * ```
+ * @returns {ClassDecorator}
+ * @constructor
+ */
+export function Command(): ClassDecorator {
+  return entityRegistryFunction('command');
+}
