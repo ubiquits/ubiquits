@@ -1,4 +1,4 @@
-import { Logger } from './logger.service';
+import { Logger, LogEvent } from './logger.service';
 import { Injectable } from '@angular/core';
 import { inject, addProviders } from '@angular/core/testing';
 import { LoggerMock } from './logger.service.mock';
@@ -40,4 +40,24 @@ describe('Logger mock', () => {
       .toHaveBeenCalled();
 
   }));
+
+  it('provides observable emitter that broadcasts all logs', inject([Logger], (l: Logger) => {
+
+    const fixture = new Error('something to log');
+
+    let logEvents:LogEvent[] = [];
+
+    const subscription = l.emitter().subscribe((e:LogEvent) => logEvents.push(e));
+
+    l.alert('error: ', fixture.message).debug(fixture);
+
+    expect(logEvents[0].level).toEqual('alert');
+    expect(logEvents[0].messages).toEqual(['error: ', fixture.message]);
+
+    expect(logEvents[1].level).toEqual('debug');
+    expect(logEvents[1].messages).toEqual([fixture]);
+
+    subscription.unsubscribe();
+  }));
+
 });

@@ -2,14 +2,15 @@
  * @module common
  */
 /** End Typedoc Module Declaration */
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { AbstractService } from './service';
 
 /**
  * Syslog Levels
  * @see http://tools.ietf.org/html/rfc5424
  */
-export type LogLevel = 'emergency'
+export type LogLevel
+  = 'emergency'
   | 'alert'
   | 'critical'
   | 'error'
@@ -30,6 +31,12 @@ export enum LogVerbosity {
 
 export interface LoggerConstructor<T extends Logger> {
   new (): T;
+}
+
+export interface LogEvent {
+  messages: any[];
+  verbosity: LogVerbosityType;
+  level: LogLevel;
 }
 
 /**
@@ -65,8 +72,18 @@ export abstract class Logger extends AbstractService {
   protected sourceName: string;
   protected verbosityLevel: LogVerbosity;
 
+  private logEmitter = new EventEmitter<LogEvent>();
+
   constructor(protected impl: LoggerConstructor<any>) {
     super();
+  }
+
+  /**
+   * Get reference to log emitter
+   * @returns {EventEmitter<LogEvent>}
+   */
+  public emitter(): EventEmitter<LogEvent> {
+    return this.logEmitter;
   }
 
   /**
@@ -169,6 +186,12 @@ export abstract class Logger extends AbstractService {
       return;
     }
 
+    this.logEmitter.emit({
+      messages,
+      level: logLevel,
+      verbosity: <LogVerbosityType>LogVerbosity[this.verbosityLevel as number],
+    });
+
     return this.persistLog(logLevel, messages)
       .setVerbosity(undefined, true); //reset the verbosity to undefined for the next log
   }
@@ -201,7 +224,8 @@ export abstract class Logger extends AbstractService {
   }
 
   /**
-   * Chainable method to allow forcing the log level to only show when log verbosity level is 'silly'
+   * Chainable method to allow forcing the log level to only show when log verbosity level is
+   * 'silly'
    *
    * Example:
    * ```typescript
@@ -219,7 +243,8 @@ export abstract class Logger extends AbstractService {
   }
 
   /**
-   * Chainable method to allow forcing the log level to only show when log verbosity level is 'verbose'
+   * Chainable method to allow forcing the log level to only show when log verbosity level is
+   * 'verbose'
    * @returns {Logger}
    */
   public get verbose() {
