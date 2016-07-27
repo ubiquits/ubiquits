@@ -5,7 +5,7 @@
 import { Injectable } from '@angular/core';
 import { Server as Hapi, Request as HapiRequest, IReply, Response as HapiResponse } from 'hapi';
 import { Server, RouteConfig } from './abstract.server';
-import { RemoteCli } from '../services/remoteCli.service';
+import { RemoteCli } from '../services/remoteCli/remoteCli.service';
 import { Logger } from '../../common/services/logger.service';
 import { Response } from '../controllers/response';
 import { Request } from '../controllers/request';

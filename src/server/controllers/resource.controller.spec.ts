@@ -8,8 +8,8 @@ import { AbstractModel, identifier } from '../../common/models/model';
 import { ServerMock } from '../servers/abstract.server.spec';
 import { MockStore } from '../../common/stores/mock.store';
 import { AbstractStore } from '../../common/stores/store';
-import { RemoteCli } from '../services/remoteCli.service';
-import { RemoteCliMock } from '../services/remoteCli.service.mock';
+import { RemoteCli } from '../services/remoteCli/remoteCli.service';
+import { RemoteCliMock } from '../services/remoteCli/remoteCli.service.mock';
 import { Request } from './request';
 import { Response } from './response';
 import { Collection } from '../../common/models/collection';
@@ -17,8 +17,8 @@ import { EventEmitter } from 'events';
 import { IncomingMessage } from 'http';
 import { Primary } from '../../common/models/types/primary.decorator';
 import * as _ from 'lodash';
-import { AuthServiceMock } from '../services/auth.service.mock';
-import { AuthService } from '../services/auth.service';
+import { AuthServiceMock } from '../services/authentication/auth.service.mock';
+import { AuthService } from '../services/authentication/auth.service';
 
 class Fruit extends AbstractModel {
   @Primary()

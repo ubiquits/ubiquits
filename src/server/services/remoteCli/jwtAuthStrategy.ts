@@ -2,7 +2,6 @@
  * @module server
  */
 /** End Typedoc Module Declaration */
-import { bannerBg } from '../../common/util/banner';
 import * as chalk from 'chalk';
 import {
   AuthenticationStrategy,
@@ -10,6 +9,7 @@ import {
   AuthenticationStrategyFactory,
   AuthenticationCallback
 } from './remoteCli.service';
+import { bannerBg } from '../../../common/util/banner';
 
 export const jwtAuthStrategyFactory:AuthenticationStrategyFactory = (remoteCliContext: RemoteCliContext): AuthenticationStrategy => {
   return function (vantage: any, options: any) {

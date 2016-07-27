@@ -3,8 +3,8 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
-import { Logger } from '../../common/services/logger.service';
-import { Service } from '../../common/registry/decorators';
+import { Logger } from '../../../common/services/logger.service';
+import { Service } from '../../../common/registry/decorators';
 import * as jwt from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 

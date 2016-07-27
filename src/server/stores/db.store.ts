@@ -4,7 +4,7 @@
 /** End Typedoc Module Declaration */
 import { Injectable, Injector } from '@angular/core';
 import { AbstractModel, ModelStatic, identifier } from '../../common/models/model';
-import { Database } from '../services/database.service';
+import { Database } from '../services/database/database.service';
 import { Logger } from '../../common/services/logger.service';
 import { AbstractStore, Query } from '../../common/stores/store';
 import { Collection } from '../../common/models/collection';

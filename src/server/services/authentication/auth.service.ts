@@ -3,9 +3,9 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
-import { Logger } from '../../common/services/logger.service';
-import { Service } from '../../common/registry/decorators';
-import { AbstractService } from '../../common/services/service';
+import { Logger } from '../../../common/services/logger.service';
+import { Service } from '../../../common/registry/decorators';
+import { AbstractService } from '../../../common/services/service';
 import { readFileSync } from 'fs';
 import * as jwt from 'jsonwebtoken';
 

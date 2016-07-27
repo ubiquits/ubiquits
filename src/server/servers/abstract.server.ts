@@ -3,7 +3,7 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
-import { RemoteCli } from '../services/remoteCli.service';
+import { RemoteCli } from '../services/remoteCli/remoteCli.service';
 import { Logger } from '../../common/services/logger.service';
 import { Server as Hapi } from 'hapi';
 import { Response } from '../controllers/response';

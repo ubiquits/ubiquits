@@ -10,11 +10,11 @@ import { Logger } from '../../common/services/logger.service';
 import { Server, RouteConfig } from '../servers/abstract.server';
 import { LoggerMock } from '../../common/services/logger.service.mock';
 import { ServerMock } from '../servers/abstract.server.spec';
-import { RemoteCli } from '../services/remoteCli.service';
-import { RemoteCliMock } from '../services/remoteCli.service.mock';
+import { RemoteCli } from '../services/remoteCli/remoteCli.service';
+import { RemoteCliMock } from '../services/remoteCli/remoteCli.service.mock';
 import { PromiseFactory } from '../../common/util/serialPromise';
-import { AuthServiceMock } from '../services/auth.service.mock';
-import { AuthService } from '../services/auth.service';
+import { AuthServiceMock } from '../services/authentication/auth.service.mock';
+import { AuthService } from '../services/authentication/auth.service';
 
 let middlewareCalls: string[] = [];
 

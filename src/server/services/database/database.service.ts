@@ -3,12 +3,12 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
-import { Logger, LogLevel } from '../../common/services/logger.service';
 import { createConnection, CreateConnectionOptions, Connection, Driver } from 'typeorm';
-import { registry } from '../../common/registry/entityRegistry';
-import { Service } from '../../common/registry/decorators';
-import { AbstractService } from '../../common/services/service';
 import * as SQL from 'sql-template-strings';
+import { LogLevel, Logger } from '../../../common/services/logger.service';
+import { Service } from '../../../common/registry/decorators';
+import { AbstractService } from '../../../common/services/service';
+import { registry } from '../../../common/registry/entityRegistry';
 
 export interface DatabaseLogFunction {
   (level: LogLevel, ...messages: any[]): void;
@@ -97,6 +97,7 @@ export class Database extends AbstractService {
     };
 
     return createConnection(options);
+
   }
 
   /**

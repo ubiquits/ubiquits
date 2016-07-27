@@ -3,21 +3,20 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable, Injector } from '@angular/core';
-import { bannerBg } from '../../common/util/banner';
-import { Logger } from '../../common/services/logger.service';
-import { Server, RouteConfig } from '../servers/abstract.server';
 import * as chalk from 'chalk';
-import { Response } from '../controllers/response';
-import { PromiseFactory } from '../../common/util/serialPromise';
 import * as Vantage from '@xiphiaz/vantage';
-import { Service } from '../../common/registry/decorators';
-import { AbstractService } from '../../common/services/service';
 
-const table: Table = require('table').default;
+import { jwtAuthStrategyFactory } from './jwtAuthStrategy';
 
 import Socket = SocketIO.Socket;
-import { AuthService } from './auth.service';
-import { jwtAuthStrategyFactory } from './jwtAuthStrategy';
+import { AbstractService } from '../../../common/services/service';
+import { Service } from '../../../common/registry/decorators';
+import { Logger } from '../../../common/services/logger.service';
+import { AuthService } from '../authentication/auth.service';
+import { Server, RouteConfig } from '../../servers/abstract.server';
+import { Response } from '../../controllers/response';
+import { PromiseFactory } from '../../../common/util/serialPromise';
+const table: Table = require('table').default;
 
 export interface TableBorderTemplate {
 

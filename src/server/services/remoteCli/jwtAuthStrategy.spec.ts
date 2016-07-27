@@ -1,9 +1,9 @@
 import { AuthenticationStrategy, RemoteCliContext } from './remoteCli.service';
-import { LoggerMock } from '../../common/services/logger.service.mock';
 import { jwtAuthStrategyFactory } from './jwtAuthStrategy';
 import * as chalk from 'chalk';
 
 import Spy = jasmine.Spy;
+import { LoggerMock } from '../../../common/services/logger.service.mock';
 
 describe('JWT Authentication Strategy', () => {
 

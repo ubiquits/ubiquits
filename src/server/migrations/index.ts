@@ -2,7 +2,7 @@
  * @module server
  */
 /** End Typedoc Module Declaration */
-import { Database } from '../services/database.service';
+import { Database } from '../services/database/database.service';
 import { Logger } from '../../common/services/logger.service';
 /**
  * Root class that all implementations of seeders *must* extend. Provides common interface for

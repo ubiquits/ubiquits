@@ -4,10 +4,9 @@
 /** End Typedoc Module Declaration */
 import { Injectable, Injector } from '@angular/core';
 import { RemoteCli, ConnectedSocketCallback } from './remoteCli.service';
-import { Logger } from '../../common/services/logger.service';
-import { Service } from '../../common/registry/decorators';
-
-import { AuthService } from './auth.service';
+import { Service } from '../../../common/registry/decorators';
+import { Logger } from '../../../common/services/logger.service';
+import { AuthService } from '../authentication/auth.service';
 
 /**
  * Provides no-side effect mock for RemoteCli for use in testing fixtures

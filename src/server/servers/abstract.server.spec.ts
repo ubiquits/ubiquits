@@ -1,14 +1,14 @@
 import { Server, RouteConfig } from './abstract.server';
-import { RemoteCli } from '../services/remoteCli.service';
+import { RemoteCli } from '../services/remoteCli/remoteCli.service';
 import { Logger } from '../../common/services/logger.service';
 import { Injectable } from '@angular/core';
 import { inject, addProviders, async } from '@angular/core/testing';
 import { LoggerMock } from '../../common/services/logger.service.mock';
-import { RemoteCliMock } from '../services/remoteCli.service.mock';
+import { RemoteCliMock } from '../services/remoteCli/remoteCli.service.mock';
 import { Response } from '../controllers/response';
 import Spy = jasmine.Spy;
-import { AuthService } from '../services/auth.service';
-import { AuthServiceMock } from '../services/auth.service.mock';
+import { AuthService } from '../services/authentication/auth.service';
+import { AuthServiceMock } from '../services/authentication/auth.service.mock';
 
 @Injectable()
 export class ServerMock extends Server {

@@ -5,8 +5,8 @@
 import 'core-js';
 import 'reflect-metadata';
 import { Server } from './servers/abstract.server';
-import { Database } from './services/database.service';
-import { RemoteCli } from './services/remoteCli.service';
+import { Database } from './services/database/database.service';
+import { RemoteCli } from './services/remoteCli/remoteCli.service';
 import { Logger } from '../common/services/logger.service';
 import { ConsoleLogger } from '../common/services/consoleLogger.service';
 import { DebugLogMiddleware } from './middleware/debugLog.middleware';

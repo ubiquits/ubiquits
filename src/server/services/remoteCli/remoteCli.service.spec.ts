@@ -1,16 +1,16 @@
 import * as proxyquire from 'proxyquire';
 import { Injector } from '@angular/core';
 import { RemoteCli } from './remoteCli.service';
-import { Logger } from '../../common/services/logger.service';
 import { addProviders, inject } from '@angular/core/testing';
-import { LoggerMock } from '../../common/services/logger.service.mock';
-import { registry } from '../../common/registry/entityRegistry';
-import { Server, RouteConfig } from '../servers/abstract.server';
-import { ServerMock } from '../servers/abstract.server.spec';
 import { RemoteCliMock } from './remoteCli.service.mock';
-import { AuthServiceMock } from './auth.service.mock';
-import { AuthService } from './auth.service';
 import * as chalk from 'chalk';
+import { Logger } from '../../../common/services/logger.service';
+import { AuthService } from '../authentication/auth.service';
+import { LoggerMock } from '../../../common/services/logger.service.mock';
+import { Server, RouteConfig } from '../../servers/abstract.server';
+import { ServerMock } from '../../servers/abstract.server.spec';
+import { AuthServiceMock } from '../authentication/auth.service.mock';
+import { registry } from '../../../common/registry/entityRegistry';
 
 import Spy = jasmine.Spy;
 

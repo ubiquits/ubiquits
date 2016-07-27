@@ -3,9 +3,9 @@
  */
 /** End Typedoc Module Declaration */
 import { Injectable } from '@angular/core';
-import { Logger } from '../../common/services/logger.service';
+import { Logger } from '../../../common/services/logger.service';
 import { Database } from './database.service';
-import { Service } from '../../common/registry/decorators';
+import { Service } from '../../../common/registry/decorators';
 
 /**
  * Provides no-side effect mock for Database for use in testing fixtures

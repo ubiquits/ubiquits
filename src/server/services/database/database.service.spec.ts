@@ -1,17 +1,17 @@
-import { Logger } from '../../common/services/logger.service';
 import { Database } from './database.service';
 import { addProviders, inject, async } from '@angular/core/testing';
 import * as typeorm from 'typeorm';
 import { Driver } from 'typeorm';
 import { Injectable } from '@angular/core';
-import { RemoteCli } from './remoteCli.service';
-import { LoggerMock } from '../../common/services/logger.service.mock';
-import { RemoteCliMock } from './remoteCli.service.mock';
-import { registry } from '../../common/registry/entityRegistry';
 import * as SQL from 'sql-template-strings';
+import { Logger } from '../../../common/services/logger.service';
+import { LoggerMock } from '../../../common/services/logger.service.mock';
+import { RemoteCli } from '../remoteCli/remoteCli.service';
+import { RemoteCliMock } from '../remoteCli/remoteCli.service.mock';
+import { AuthService } from '../authentication/auth.service';
+import { AuthServiceMock } from '../authentication/auth.service.mock';
 import Spy = jasmine.Spy;
-import { AuthServiceMock } from './auth.service.mock';
-import { AuthService } from './auth.service';
+import { registry } from '../../../common/registry/entityRegistry';
 
 @Injectable()
 class ExampleUtil {
@@ -185,9 +185,15 @@ describe('Database', () => {
       const resultMock = [{foo: 'bar'}];
 
       const driverMock = {
-        beginTransaction: jasmine.createSpy('beginTransaction').and.returnValue(Promise.resolve()),
-        commitTransaction: jasmine.createSpy('commitTransaction').and.returnValue(Promise.resolve()),
-        query: jasmine.createSpy('query').and.returnValue(resultMock),
+        beginTransaction: jasmine.createSpy('beginTransaction')
+          .and
+          .returnValue(Promise.resolve()),
+        commitTransaction: jasmine.createSpy('commitTransaction')
+          .and
+          .returnValue(Promise.resolve()),
+        query: jasmine.createSpy('query')
+          .and
+          .returnValue(resultMock),
       };
 
       connectionSpy.driver = driverMock;
@@ -195,10 +201,12 @@ describe('Database', () => {
       return util.flagLongUsernames('admin', 5)
         .then(() => {
 
-          expect(connectionSpy.driver.beginTransaction).toHaveBeenCalled();
+          expect(connectionSpy.driver.beginTransaction)
+            .toHaveBeenCalled();
           expect(connectionSpy.driver.query)
             .toHaveBeenCalledWith((SQL as any)`UPDATE users SET flagged = LENGTH(username) > ${5} WHERE role = ${'admin'}`);
-          expect(connectionSpy.driver.commitTransaction).toHaveBeenCalled();
+          expect(connectionSpy.driver.commitTransaction)
+            .toHaveBeenCalled();
         });
 
     })));
@@ -206,10 +214,18 @@ describe('Database', () => {
     it('runs complex queries with exceptions rolling back transactions', async(inject([ExampleUtil, Database], (util: ExampleUtil, database: Database) => {
 
       const driverMock = {
-        beginTransaction: jasmine.createSpy('beginTransaction').and.returnValue(Promise.resolve()),
-        commitTransaction: jasmine.createSpy('commitTransaction').and.returnValue(Promise.resolve()),
-        rollbackTransaction: jasmine.createSpy('rollbackTransaction').and.returnValue(Promise.resolve()),
-        query: jasmine.createSpy('query').and.returnValue(Promise.reject(new Error('DB Error'))),
+        beginTransaction: jasmine.createSpy('beginTransaction')
+          .and
+          .returnValue(Promise.resolve()),
+        commitTransaction: jasmine.createSpy('commitTransaction')
+          .and
+          .returnValue(Promise.resolve()),
+        rollbackTransaction: jasmine.createSpy('rollbackTransaction')
+          .and
+          .returnValue(Promise.resolve()),
+        query: jasmine.createSpy('query')
+          .and
+          .returnValue(Promise.reject(new Error('DB Error'))),
       };
 
       connectionSpy.driver = driverMock;
@@ -217,10 +233,15 @@ describe('Database', () => {
       return util.flagLongUsernames('admin', 5)
         .then(() => {
 
-          expect(connectionSpy.driver.beginTransaction).toHaveBeenCalled();
-          expect(connectionSpy.driver.query).toHaveBeenCalled();
-          expect(connectionSpy.driver.commitTransaction).not.toHaveBeenCalled();
-          expect(connectionSpy.driver.rollbackTransaction).toHaveBeenCalled();
+          expect(connectionSpy.driver.beginTransaction)
+            .toHaveBeenCalled();
+          expect(connectionSpy.driver.query)
+            .toHaveBeenCalled();
+          expect(connectionSpy.driver.commitTransaction)
+            .not
+            .toHaveBeenCalled();
+          expect(connectionSpy.driver.rollbackTransaction)
+            .toHaveBeenCalled();
         });
 
     })));

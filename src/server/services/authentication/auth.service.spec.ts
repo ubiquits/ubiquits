@@ -1,7 +1,7 @@
 import * as proxyquire from 'proxyquire';
-import { Logger } from '../../common/services/logger.service';
+import { Logger } from '../../../common/services/logger.service';
 import { addProviders, async, inject } from '@angular/core/testing';
-import { LoggerMock } from '../../common/services/logger.service.mock';
+import { LoggerMock } from '../../../common/services/logger.service.mock';
 import { AuthServiceMock } from './auth.service.mock';
 import { AuthService } from './auth.service';
 
