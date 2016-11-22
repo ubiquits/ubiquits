@@ -364,5 +364,4 @@ export class ValidationException extends UnprocessableEntityException {
     this.data = errors;
   }
 
-
 }

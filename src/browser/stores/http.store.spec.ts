@@ -244,4 +244,32 @@ describe('Http store', () => {
 
   })));
 
+
+  // @todo add all methods
+  ['saveOne', 'deleteOne'].forEach((method) => {
+
+    it(`Logs error on failed ${method}`, async(inject([TestHttpStore, MockBackend], (s: TestHttpStore, b: MockBackend) => {
+
+      const modelData = {id: 123, name: 'foo'};
+
+      const mock = new TestModel(modelData);
+
+      let logSpy = spyOn((s as any).logger, 'error');
+
+      let connection: MockConnection;
+      b.connections.subscribe((c: MockConnection) => connection = c);
+
+      const testPromise = s[method](mock)
+        .catch(() => {
+          expect(logSpy)
+            .toHaveBeenCalledWith('Internal Error');
+        });
+      connection.mockError(new Error('Internal Error'));
+
+      return testPromise;
+
+    })));
+
+  });
+
 });
