@@ -47,19 +47,22 @@ export class ExpressServer extends Server {
    */
   protected registerRouteWithEngine(routeConfig: RouteConfig): this {
 
-    this.app[routeConfig.method.toLowerCase()](routeConfig.path, (req: ExpressRequest, res: ExpressResponse) => {
+    this.app[routeConfig.method.toLowerCase()](routeConfig.path, async (req: ExpressRequest, res: ExpressResponse) => {
 
-      let request = new Request(req,
+      let request = new Request(
+        req,
         Request.extractMapFromDictionary<string, string>(req.params),
-        Request.extractMapFromDictionary<string, string>(req.headers));
+        Request.extractMapFromDictionary<string, string>(req.headers)
+      );
 
-      let response = this.getDefaultResponse();
+      let defaultResponse = this.getDefaultResponse();
 
-      return routeConfig.callStackHandler(request, response)
-        .then((response: Response) => {
-          return this.send(response, res);
-        })
-        .catch((err: Error) => this.sendErr(err, res));
+      try {
+        const response: Response = await routeConfig.callStackHandler(request, defaultResponse);
+        return this.send(response, res);
+      } catch (err) {
+        return this.sendErr(err, res)
+      }
 
     });
 
@@ -121,11 +124,12 @@ export class ExpressServer extends Server {
    * @inheritdoc
    * @returns {Promise<ExpressServer>}
    */
-  public startEngine(): Promise<this> {
-    return new Promise((resolve, reject) => {
+  public async startEngine(): Promise<this> {
+    await new Promise((resolve, reject) => {
       this.httpServer.listen(this.port, this.host, resolve);
-    })
-      .then(() => this);
+    });
+
+    return this;
   }
 
   /**

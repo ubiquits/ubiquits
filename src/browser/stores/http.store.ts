@@ -42,61 +42,81 @@ export abstract class HttpStore<T extends AbstractModel> extends AbstractStore<T
   /**
    * @inheritdoc
    */
-  public findOne(id: identifier): Promise<T> {
+  public async findOne(id: identifier): Promise<T> {
 
-    return this.http.get(this.endpoint(id))
-      .toPromise()
-      .then((res: Response) => this.checkStatus(res))
-      .then((res: Response) => this.extractModel(res))
-      .catch((error) => this.handleError(error));
+    try {
+      const res: Response = await this.http.get(this.endpoint(id)).toPromise();
+      await this.checkStatus(res);
+      return this.extractModel(res);
+    } catch (e) {
+      return this.handleError(e);
+    }
 
   }
 
   /**
    * @inheritdoc
    */
-  public findMany(query?:any):Promise<Collection<T>> {
-    return this.http.get(this.endpoint())
-      .toPromise()
-      .then((res: Response) => this.checkStatus(res))
-      .then((res: Response) => this.extractCollection(res))
-      .catch((error) => this.handleError(error));
+  public async findMany(query?:any):Promise<Collection<T>> {
+
+    try {
+      const res: Response = await this.http.get(this.endpoint()).toPromise();
+      await this.checkStatus(res);
+      return this.extractCollection(res);
+    } catch (e) {
+      return this.handleError(e);
+    }
+
   }
 
   /**
    * @inheritdoc
    */
-  public saveOne(model:T):Promise<T> {
+  public async saveOne(model:T):Promise<T> {
     //@todo consider toJson method if custom serializing is needed?
     //@todo extract only changed properties
     //@todo switch on if existing and decide if put or patch request
-    return this.http.put(this.endpoint(model.getIdentifier()), model)
-      .toPromise()
-      .then((res: Response) => this.checkStatus(res))
-      .then(() => model) //@todo flag model as existing
-      // .catch((error) => this.handleError(error));
+    try {
+      const url = this.endpoint(model.getIdentifier());
+      const res: Response = await this.http.put(url, model).toPromise();
+      await this.checkStatus(res);
+      return model; //@todo flag model as existing
+    } catch (e) {
+      return this.handleError(e);
+    }
+
   }
 
   /**
    * @inheritdoc
    */
-  public deleteOne(model: T): Promise<T> {
+  public async deleteOne(model: T): Promise<T> {
 
-    return this.http.delete(this.endpoint(model.getIdentifier()))
-      .toPromise()
-      .then((res: Response) => this.checkStatus(res))
-      .then(() => model); //@todo flag model as existing
+    try {
+      const url = this.endpoint(model.getIdentifier());
+      const res: Response = await this.http.delete(url).toPromise();
+      await this.checkStatus(res);
+      return model; //@todo flag model as not existing
+    } catch (e) {
+      return this.handleError(e);
+    }
+
   }
 
   /**
    * @inheritdoc
    */
-  public hasOne(model: T): Promise<boolean> {
-    return this.http.head(this.endpoint(model.getIdentifier()))
-      .toPromise()
-      .then((res: Response) => this.checkStatus(res))
-      .then(() => true)
-      .catch(() => false)
+  public async hasOne(model: T): Promise<boolean> {
+
+    try {
+      const url = this.endpoint(model.getIdentifier());
+      const res: Response = await this.http.delete(url).toPromise();
+      await this.checkStatus(res);
+      return true;
+    } catch (e) {
+      return false; //@todo assert notfound exception
+    }
+
   }
 
   /**
@@ -148,7 +168,7 @@ export abstract class HttpStore<T extends AbstractModel> extends AbstractStore<T
    * @param res
    * @returns {any}
    */
-  private checkStatus(res: Response):Response|Promise<any> {
+  private checkStatus(res: Response): Response|Promise<any> {
     if (res.ok){
       return res;
     }

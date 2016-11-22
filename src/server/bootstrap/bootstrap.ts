@@ -43,15 +43,15 @@ export function deferredLog(level: LogLevel, ...messages: any[]) {
 }
 
 /**
- * Handles the logging of any error encountered during bootstrap. If there is an instance of [[Logger]]
- * available, it is used, otherwise a fallback to console.error is used.
+ * Handles the logging of any error encountered during bootstrap. If there is an instance of
+ * [[Logger]] available, it is used, otherwise a fallback to console.error is used.
  *
  * In either case, all of the deferred logs are output first, then the error is logged and the
  * process is aborted
  * @param e
  * @param logger
  */
-function handleBootstrapError(e: Error, logger: Logger) {
+function handleBootstrapError(e: Error, logger: Logger): void {
   if (logger) {
     deferredLogs.forEach((log: DeferredLog) => {
       logger[log.level](...log.messages);
@@ -60,7 +60,7 @@ function handleBootstrapError(e: Error, logger: Logger) {
     logger.critical(e.constructor.name, e.message)
       .debug(e.stack);
 
-    if (logger instanceof LoggerMock){
+    if (logger instanceof LoggerMock) {
       console.log('Logger is mock but a critical error occurred, outputting to console');
       console.error(e);
     }
@@ -93,73 +93,67 @@ export function bootstrap(loadClasses: ClassDictionary<any>[] = [], providers: P
 
   let logger: Logger;
 
-
   deferredLog('debug', 'Classes loaded from app', loadClasses.reduce((all: string[], classDict: ClassDictionary<any>) => {
     return all.concat(Object.keys(classDict));
   }, []));
 
-  return (): Promise<BootstrapResponse> => {
+  return async(): Promise<BootstrapResponse> => {
 
-    deferredLog('info', 'Bootstrapping server');
-    return Promise.all(CORE_PROVIDERS.concat(providers))
-      .then((providers: ProviderType[]) => {
+    try {
+      deferredLog('info', 'Bootstrapping server');
+      const resolvedProviders: ProviderType[] = await Promise.all(CORE_PROVIDERS.concat(providers));
 
-        //initialize all bootstrappers (in order they need to be created)
-        const resolvedBootstrappers: EntityBootstrapper[] = [
-          new ModelBootstrapper,
-          new ServiceBootstrapper,
-          new MigrationBootstrapper,
-          new SeederBootstrapper,
-          new ControllerBootstrapper,
-        ];
+      //initialize all bootstrappers (in order they need to be created)
+      const resolvedBootstrappers: EntityBootstrapper[] = [
+        new ModelBootstrapper,
+        new ServiceBootstrapper,
+        new MigrationBootstrapper,
+        new SeederBootstrapper,
+        new ControllerBootstrapper,
+      ];
 
-        const bootrapperProviders:any[] = resolvedBootstrappers.reduce((result: any[], bootstrapper: EntityBootstrapper) => {
-          return result.concat(bootstrapper.getInjectableEntities());
-        }, []);
+      const bootrapperProviders: any[] = resolvedBootstrappers.reduce((result: any[], bootstrapper: EntityBootstrapper) => {
+        return result.concat(bootstrapper.getInjectableEntities());
+      }, []);
 
-        const mergedProviders = ReflectiveInjector.resolve(bootrapperProviders.concat(providers));
+      const mergedProviders = ReflectiveInjector.resolve(bootrapperProviders.concat(resolvedProviders));
 
-        const injector = ReflectiveInjector.fromResolvedProviders(mergedProviders);
+      const injector = ReflectiveInjector.fromResolvedProviders(mergedProviders);
 
-        logger = injector.get(Logger)
-          .source('bootstrap');
+      logger = injector.get(Logger)
+        .source('bootstrap');
 
-        // iterate over any logs that have been deferred
-        deferredLogs.forEach((log: DeferredLog) => {
-          logger[log.level](...log.messages);
-        });
-        deferredLogs = []; //clear buffer
-
-        // iterate over all of the resolved bootstrappers, invoking the bootstrap to initialize the
-        // entities. iteration is completed in serial so that bootstrappers that depend on other
-        // entities won't invoke until those other entities are finished intializing
-        return resolvedBootstrappers.reduce((current: Promise<void>, next: EntityBootstrapper): Promise<void> => {
-
-            return current.then((): Promise<void> => {
-
-              return Promise.resolve(next.setInjector(injector)
-                .invokeBootstrap());
-            });
-
-          }, Promise.resolve()) //initial value
-          .then(() => {
-            // get vars for the bootstrapper
-            const server: Server = injector.get(Server);
-
-            let response = {injector, server, logger};
-
-            if (afterBootstrap) {
-              return Promise.resolve(afterBootstrap(response))
-                .then(() => response);
-            }
-
-            return response;
-          });
-
-      })
-      .catch((e) => {
-        handleBootstrapError(e, logger);
+      // iterate over any logs that have been deferred
+      deferredLogs.forEach((log: DeferredLog) => {
+        logger[log.level](...log.messages);
       });
+      deferredLogs = []; //clear buffer
+
+      // iterate over all of the resolved bootstrappers, invoking the bootstrap to initialize the
+      // entities. iteration is completed in serial so that bootstrappers that depend on other
+      // entities won't invoke until those other entities are finished intializing
+      await resolvedBootstrappers.reduce(async(current: Promise<void>, next: EntityBootstrapper): Promise<void> => {
+
+        await current;
+
+        return Promise.resolve(next.setInjector(injector).invokeBootstrap());
+
+      }, Promise.resolve()); //initial value
+      // get vars for the bootstrapper
+      const server: Server = injector.get(Server);
+
+      let response = {injector, server, logger};
+
+      if (afterBootstrap) {
+        await afterBootstrap(response);
+        // await Promise.resolve(afterBootstrap(response));
+        return response;
+      }
+
+      return response;
+    } catch (e) {
+      handleBootstrapError(e, logger);
+    }
 
   }
 

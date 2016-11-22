@@ -161,26 +161,28 @@ export abstract class AbstractController extends RegistryEntity<ControllerMetada
         method: methodDefinition.method,
         path: `${process.env.API_BASE}/${this.getMetadata().routeBase}${methodDefinition.route}`,
         callStack: callStack,
-        callStackHandler: (request: Request, response: Response): Promise<Response> => {
-          return callStack.reduce((current: Promise<Response>, next: PromiseFactory<Response>): Promise<Response> => {
+        callStackHandler: async (request: Request, response: Response): Promise<Response> => {
 
-              return current.then((response: Response): Promise<Response> => {
-                return Promise.resolve(next.call(this, request, response));
-              });
+          try {
 
-            }, Promise.resolve(response)) //initial value
-            .catch((e) => {
+            return await callStack.reduce(async (currentRequest: Promise<Response>, next: PromiseFactory<Response>): Promise<Response> => {
+              const response = await currentRequest;
 
-              if (!(e instanceof HttpException)) {
-                e = new InternalServerErrorException(e.message);
-              }
-              response.status(e.getStatusCode());
+              return next.call(this, request, response);
+            }, Promise.resolve(response)); //initial value
 
-              const message = e.getData() || e.toString();
+          } catch (e) {
+            if (!(e instanceof HttpException)) {
+              e = new InternalServerErrorException(e.message);
+            }
 
-              response.data({message});
-              return response;
-            });
+            const message = e.getData() || e.toString();
+
+            return response
+              .status(e.getStatusCode())
+              .data({message});
+          }
+
         }
       });
 
