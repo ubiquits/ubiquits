@@ -1,3 +1,23 @@
+# THIS REPOSITORY IS DEPRECATED!
+Please note that the Ubiquits project has moved over to https://github.com/zerothstack/zeroth (http://zeroth.io)
+The API's are unchanged, it is just a project rename. All npm references have change from `@ubiquits/` to `@zerothstack/`
+
+Apologies for any inconvenience.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [![Build Status](https://travis-ci.org/ubiquits/ubiquits.svg?branch=master)](https://travis-ci.org/ubiquits/ubiquits)
 [![Coverage Status](https://coveralls.io/repos/github/ubiquits/ubiquits/badge.svg?branch=master)](https://coveralls.io/github/ubiquits/ubiquits?branch=master)
 [![npm (scoped)](https://img.shields.io/npm/v/@ubiquits/core.svg?maxAge=2592000)](https://www.npmjs.com/package/@ubiquits/core)
